@@ -6,7 +6,7 @@ const userRouter = Router();
 
 userRouter.post("/user/signup", authValidator.signup, authController.signup);
 
-userRouter.get("/user/login", authController.login);
+userRouter.post("/user/login", authValidator.login, authController.login);
 
 userRouter.get("/user/logout", authController.logout);
 

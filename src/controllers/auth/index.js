@@ -1,5 +1,7 @@
-import { hash } from "bcrypt";
+import { hash, compare } from "bcrypt";
 import userModel from "../../models/users/index.js";
+import jwt from "jsonwebtoken";
+import tokenModel from "../../models/token/index.js";
 
 const authController = {
   signup: async (req, res) => {
@@ -43,16 +45,65 @@ const authController = {
         createdUser,
       });
     } catch (err) {
-      console.log(err.message);
+      console.log("Error in signup controller", err.message);
       res.status(500).json({
         message: "Internal server error",
       });
     }
   },
-  login: (req, res) => {
-    res.json({
-      message: "Login API hit",
-    });
+  login: async (req, res) => {
+    try {
+      const { username, password } = req.body;
+
+      // check if username exists
+      const userCheck = await userModel.findOne({ username });
+      if (!userCheck) {
+        return res.status(400).json({
+          message: "User with this username doesnot exist",
+        });
+      }
+
+      // check password
+      const comparePassword = await compare(password, userCheck.password);
+      if (!comparePassword) {
+        return res.status(400).json({
+          message: "Invalid password",
+        });
+      }
+
+      const data = {
+        id: userCheck.id,
+        username: userCheck.username,
+      };
+
+      // generateTokenAndSetCookie(data, res);
+      const token = jwt.sign(
+        {
+          data,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+
+      // Save token in DB
+      await tokenModel.create({ token });
+
+      res
+        .cookie("jwt", token, {
+          httpOnly: true, // XSS attacks prevention
+          // sameSite: "strict", // CSRF attacks prevention
+        })
+        .json({
+          message: "User logged in successfully",
+        });
+    } catch (err) {
+      console.log("Error in login Controller", err.message);
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
   },
   logout: (req, res) => {
     res.json({
