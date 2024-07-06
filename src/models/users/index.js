@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    fullname: {
+    fullName: {
       type: String,
       required: true,
       unique: true,
@@ -58,6 +58,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const UserModel = mongoose.model("UserModel", userSchema);
+const userModel = mongoose.model("User", userSchema);
 
-export default UserModel;
+export default userModel;
