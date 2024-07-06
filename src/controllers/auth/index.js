@@ -1,8 +1,16 @@
 const authController = {
   signup: (req, res) => {
-    res.json({
-      message: "Signup API hit",
-    });
+    try {
+      const payload = req.body;
+      res.json({
+        message: payload,
+      });
+    } catch (err) {
+      console.log(err.message);
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
   },
   login: (req, res) => {
     res.json({
