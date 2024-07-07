@@ -83,7 +83,7 @@ const authController = {
         },
         process.env.JWT_SECRET,
         {
-          expiresIn: "1h",
+          expiresIn: "1d",
         }
       );
 
@@ -105,10 +105,23 @@ const authController = {
       });
     }
   },
-  logout: (req, res) => {
-    res.json({
-      message: "Logout API hit",
-    });
+  logout: async (req, res) => {
+    try {
+      let token = req.headers.authorization;
+      token = token.replace("Bearer ", "");
+
+      // delete token from db
+      await tokenModel.deleteOne({ token });
+
+      res.cookie("jwt", "").status(200).json({
+        message: "Logged out successfully",
+      });
+    } catch (err) {
+      console.log("Error in logout Controller", err.message);
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
   },
 };
 
