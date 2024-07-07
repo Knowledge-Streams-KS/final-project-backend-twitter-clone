@@ -107,14 +107,26 @@ const authController = {
   },
   logout: async (req, res) => {
     try {
-      let token = req.headers.authorization;
-      token = token.replace("Bearer ", "");
+      let token = req.token;
 
       // delete token from db
       await tokenModel.deleteOne({ token });
 
-      res.cookie("jwt", "").status(200).json({
+      res.clearCookie("jwt").status(200).json({
         message: "Logged out successfully",
+      });
+    } catch (err) {
+      console.log("Error in logout Controller", err.message);
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  },
+  getUser: async (req, res) => {
+    try {
+      const user = await userModel.findById(req.user.id).select("-password");
+      res.status(200).json({
+        data: user,
       });
     } catch (err) {
       console.log("Error in logout Controller", err.message);
