@@ -12,6 +12,6 @@ userRouter.post("/user/login", authValidator.login, authController.login);
 
 userRouter.post("/user/logout", verifyToken, authController.logout);
 
-userRouter.get("/user", verifyToken, authController.getUser);
+userRouter.get("/user", verifyToken, checkTokenFromDb, authController.getUser);
 
 export default userRouter;

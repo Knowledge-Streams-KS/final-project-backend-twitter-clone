@@ -78,9 +78,8 @@ const authController = {
 
       // generateTokenAndSetCookie(data, res);
       const token = jwt.sign(
-        {
-          data,
-        },
+        data,
+
         process.env.JWT_SECRET,
         {
           expiresIn: "1d",
