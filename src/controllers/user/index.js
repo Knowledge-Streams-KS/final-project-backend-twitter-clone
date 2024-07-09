@@ -1,4 +1,5 @@
 import userModel from "../../models/users/index.js";
+import notificationModel from "../../models/notification/index.js";
 
 const userController = {
   getUserProfile: async (req, res) => {
@@ -52,17 +53,27 @@ const userController = {
         });
       } else {
         // follow user
+
         await userModel.findByIdAndUpdate(id, {
           $push: { followers: req.user.id },
         });
         await userModel.findByIdAndUpdate(req.user.id, {
           $push: { following: id },
         });
+
+        // send notification to the user
+
+        const newNotification = new notificationModel({
+          type: "follow",
+          from: req.user.id,
+          to: userToModify._id,
+        });
+
+        await newNotification.save();
+
         res.status(200).json({
           message: "User followed successfully",
         });
-
-        // send notification to the user
       }
     } catch (err) {
       console.log("Error in followUnfollowUser controller", err.message);

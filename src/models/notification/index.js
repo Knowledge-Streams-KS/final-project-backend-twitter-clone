@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import userModel from "../users/index.js";
 
 const notificationSchema = new mongoose.Schema(
   {
