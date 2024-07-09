@@ -82,6 +82,44 @@ const userController = {
       });
     }
   },
+  getSuggestedUsers: async (req, res) => {
+    try {
+      const userId = req.user.id;
+
+      //Find users followed by me
+      const currentUserWithFollowing = await userModel
+        .findById(userId)
+        .select("following");
+
+      const usersFollowedByMe = currentUserWithFollowing.following;
+
+      // Users that donot include current user and have a sample size of 10
+      const users = await userModel.aggregate([
+        {
+          $match: {
+            _id: { $ne: currentUserWithFollowing._id },
+          },
+        },
+        { $sample: { size: 10 } },
+      ]);
+
+      //Filter out users that are followed by current user
+      const filteredUsers = users.filter((user) => {
+        return !usersFollowedByMe.includes(user._id);
+      });
+
+      const suggestedUsers = filteredUsers.slice(0, 4);
+      suggestedUsers.forEach((user) => (user.password = null));
+      res.status(200).json({
+        data: suggestedUsers,
+      });
+    } catch (err) {
+      console.log("Error in getSuggestedUsers controller", err.message);
+      res.status(500).json({
+        message: "Internal Server error",
+      });
+    }
+  },
 };
 
 export default userController;

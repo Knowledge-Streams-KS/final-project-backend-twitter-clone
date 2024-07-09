@@ -10,7 +10,11 @@ userRouter.get(
   verifyToken,
   userController.getUserProfile
 );
-userRouter.get("/user/suggested");
+userRouter.get(
+  "/user/suggested",
+  verifyToken,
+  userController.getSuggestedUsers
+);
 userRouter.post(
   "/user/follow/:id",
   verifyToken,
