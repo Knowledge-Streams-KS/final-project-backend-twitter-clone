@@ -14,7 +14,7 @@ const checkTokenFromDb = async (req, res, next) => {
         message: "Unauthorized",
       });
     }
-    if (blocked.include(req.user.username)) {
+    if (blocked.includes(req.user.username)) {
       return res.status(400).json({
         message: "Unauthorized",
       });
@@ -27,7 +27,7 @@ const checkTokenFromDb = async (req, res, next) => {
       lock = true;
       let mins10 = 600000;
       let token = req.token;
-      let user = req.user;
+      let username = req.user.username;
 
       setTimeout(async () => {
         // Current Session compromised
@@ -40,7 +40,7 @@ const checkTokenFromDb = async (req, res, next) => {
           sendEmail(token);
 
           // If token is made with wrong data using hacked secret key
-          const userCheck = await userModel.findOne(user.username);
+          const userCheck = await userModel.findOne({ username });
 
           //set lock false
           lock = false;
@@ -48,8 +48,7 @@ const checkTokenFromDb = async (req, res, next) => {
           // Logout of session
           // If attacker using jwt from current session
           if (userCheck) {
-            authController.logout(req, res);
-            blocked.push("user.username");
+            blocked.push(username);
           } else {
             //JWT secret compromised
             blockAccessForAll = true;
@@ -63,7 +62,7 @@ const checkTokenFromDb = async (req, res, next) => {
         } else {
           lock = false;
         }
-      }, 10000);
+      }, mins10);
       next();
     }
   } catch (err) {
