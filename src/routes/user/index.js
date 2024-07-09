@@ -5,9 +5,17 @@ import checkTokenFromDb from "../../middleware/auth/checkTokenDb.js";
 
 const userRouter = Router();
 
-userRouter.get("/user/profile/:username", userController.getUserProfile);
+userRouter.get(
+  "/user/profile/:username",
+  verifyToken,
+  userController.getUserProfile
+);
 userRouter.get("/user/suggested");
-userRouter.post("/user/follow/:id");
+userRouter.post(
+  "/user/follow/:id",
+  verifyToken,
+  userController.followUnfollowUser
+);
 userRouter.post("/user/update");
 
 export default userRouter;
