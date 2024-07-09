@@ -77,14 +77,7 @@ const authController = {
       };
 
       // generateTokenAndSetCookie(data, res);
-      const token = jwt.sign(
-        data,
-
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "1d",
-        }
-      );
+      const token = jwt.sign(data, process.env.JWT_SECRET);
 
       // Save token in DB
       await tokenModel.create({ token });

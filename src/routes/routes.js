@@ -1,5 +1,6 @@
-import userRouter from "./auth/index.js";
+import authRouter from "./auth/index.js";
+import userRouter from "./user/index.js";
 
-const allRoutes = [userRouter];
+const allRoutes = [authRouter, userRouter];
 
 export default allRoutes;
