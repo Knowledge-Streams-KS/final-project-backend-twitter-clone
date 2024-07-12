@@ -103,6 +103,10 @@ const postController = {
           { _id: postId },
           { $pull: { likes: userId } }
         );
+        await userModel.updateOne(
+          { _id: userId },
+          { $pull: { likedPosts: postId } }
+        );
         res.status(200).json({
           message: "Post unliked successfully",
         });
@@ -112,6 +116,11 @@ const postController = {
         //  alternate ways:
         // 1. await postModel.updateOne({_id: postId}, {$push: {likes: userId}})
         // 2. post.likes.push(userId) and post.save()
+
+        await userModel.updateOne(
+          { _id: userId },
+          { $push: { likedPosts: postId } }
+        );
 
         if (userId !== post.user.toString()) {
           await notificationModel.create({
@@ -187,6 +196,44 @@ const postController = {
       });
     } catch (err) {
       console.log("Error in getAllPosts controller", err.messgae);
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
+  },
+  getLikedPosts: async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          message: "user not found",
+        });
+      }
+
+      // get me posts that are in users liked posts
+      const likedPosts = await postModel
+        .find({ _id: { $in: user.likedPosts } })
+        .populate({
+          path: "user",
+          select: "-password",
+        })
+        .populate({
+          path: "comments.user",
+          select: "-password",
+        });
+
+      if (likedPosts.length === 0) {
+        return res.status(200).json({
+          data: [],
+        });
+      }
+
+      res.status(200).json({
+        data: likedPosts,
+      });
+    } catch (err) {
+      console.log("Error in getLikedPosts controller", err.message);
       res.status(500).json({
         message: "Internal Server Error",
       });
