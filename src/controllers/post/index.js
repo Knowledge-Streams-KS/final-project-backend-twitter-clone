@@ -239,6 +239,63 @@ const postController = {
       });
     }
   },
+  getFollowingPosts: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          message: "user not found",
+        });
+      }
+
+      let usersFollowing = user.following;
+
+      //   const followingPosts = await postModel
+      //     .find({ user: { $in: usersFollowing } })
+      //     .populate({
+      //       path: "user",
+      //       select: "-password",
+      //     })
+      //     .populate({
+      //       path: "comments.user",
+      //       select: "-password",
+      //     })
+      //     .sort({ createdAt: -1 });
+
+      // tried using forEach but due to async await it wasnt giving me the required results
+      // so I had to resort to a for loop
+
+      let followingPosts = [];
+
+      for (let i = 0; i < usersFollowing.length; i++) {
+        let user = usersFollowing[i];
+        const posts = await postModel
+          .find({ user })
+          .populate({
+            path: "user",
+            select: "-password",
+          })
+          .populate({
+            path: "comments.user",
+            select: "-password",
+          });
+
+        posts.forEach((post) => {
+          followingPosts.push(post);
+        });
+      }
+
+      res.status(200).json({
+        data: followingPosts,
+      });
+    } catch (err) {
+      console.log("Error in getFollowingPosts controller", err.message);
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
+  },
 };
 
 export default postController;

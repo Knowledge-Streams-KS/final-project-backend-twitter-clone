@@ -13,8 +13,14 @@ postRouter.post("/post/like/:id", verifyToken, postController.likeUnlikePost);
 
 postRouter.post("/post/comment/:id", verifyToken, postController.commentOnPost);
 
-postRouter.get("/posts", verifyToken, postController.getAllPosts);
+postRouter.get("/post/all", verifyToken, postController.getAllPosts);
 
-postRouter.get("/posts/likes/:id", verifyToken, postController.getLikedPosts);
+postRouter.get("/post/likes/:id", verifyToken, postController.getLikedPosts);
+
+postRouter.get(
+  "/post/following",
+  verifyToken,
+  postController.getFollowingPosts
+);
 
 export default postRouter;
