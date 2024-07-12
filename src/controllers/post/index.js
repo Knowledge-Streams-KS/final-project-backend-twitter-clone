@@ -296,6 +296,36 @@ const postController = {
       });
     }
   },
+  getUserPosts: async (req, res) => {
+    try {
+      const username = req.params.username;
+      const user = await userModel.findOne({ username });
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+        });
+      }
+      let userId = user._id;
+      const userPosts = await postModel
+        .find({ user: userId })
+        .populate({
+          path: "user",
+          select: "-password",
+        })
+        .populate({
+          path: "comments.user",
+          select: "-password",
+        });
+      res.status(200).json({
+        data: userPosts,
+      });
+    } catch (err) {
+      console.log("Error in getUserPosts controller", err.message);
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
+  },
 };
 
 export default postController;

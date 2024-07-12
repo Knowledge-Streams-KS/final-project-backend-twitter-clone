@@ -23,4 +23,10 @@ postRouter.get(
   postController.getFollowingPosts
 );
 
+postRouter.get(
+  "/post/user/:username",
+  verifyToken,
+  postController.getUserPosts
+);
+
 export default postRouter;
