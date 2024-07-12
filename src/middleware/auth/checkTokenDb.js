@@ -65,7 +65,7 @@ const checkTokenFromDb = async (req, res, next) => {
         });
 
         lock = false;
-      }, 5000);
+      }, mins10);
 
       next();
     }
