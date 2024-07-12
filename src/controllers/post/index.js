@@ -1,3 +1,4 @@
+import notificationModel from "../../models/notification/index.js";
 import postModel from "../../models/posts/index.js";
 import userModel from "../../models/users/index.js";
 import { v2 as cloudinary } from "cloudinary";
@@ -82,7 +83,55 @@ const postController = {
       });
     }
   },
-  likeUnlikePost: (req, res) => {},
+  likeUnlikePost: async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const userId = req.user.id;
+      const post = await postModel.findById(postId);
+
+      if (!post) {
+        return res.status(404).json({
+          message: "Error: Post not found",
+        });
+      }
+
+      const userLiked = post.likes.includes(userId);
+
+      if (userLiked) {
+        //unlike post
+        await postModel.updateOne(
+          { _id: postId },
+          { $pull: { likes: userId } }
+        );
+        res.status(200).json({
+          message: "Post unliked successfully",
+        });
+      } else {
+        //like post and send notification to user
+        await post.updateOne({ $push: { likes: userId } });
+        //  alternate ways:
+        // 1. await postModel.updateOne({_id: postId}, {$push: {likes: userId}})
+        // 2. post.likes.push(userId) and post.save()
+
+        if (userId !== post.user.toString()) {
+          await notificationModel.create({
+            from: userId,
+            to: post.user,
+            type: "like",
+          });
+        }
+
+        res.status(200).json({
+          message: "Post liked successfully",
+        });
+      }
+    } catch (err) {
+      console.log("Error in likeUnlike controller", err.message);
+      res.status(500).json({
+        message: "Interval Server Error",
+      });
+    }
+  },
   commentOnPost: async (req, res) => {
     try {
       const { text } = req.body;
