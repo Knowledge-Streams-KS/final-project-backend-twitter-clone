@@ -76,7 +76,6 @@ const postController = {
         message: "Post deleted successfully",
       });
     } catch (err) {
-      console.log(err);
       console.log("Error in  deletepost controller"), err.message;
       res.status(500).json({
         message: "Interval Server Error",
@@ -84,7 +83,36 @@ const postController = {
     }
   },
   likeUnlikePost: (req, res) => {},
-  commentOnPost: (req, res) => {},
+  commentOnPost: async (req, res) => {
+    try {
+      const { text } = req.body;
+      const postId = req.params.id;
+      const userId = req.user.id;
+
+      const post = await postModel.findById(postId);
+
+      if (!post) {
+        res.status(404).json({
+          message: "Post not found",
+        });
+      }
+
+      let comment = { user: userId, text: text };
+
+      post.comments.push(comment);
+
+      await post.save();
+
+      res.status(200).json({
+        data: comment,
+      });
+    } catch (err) {
+      console.log("Error in commentOnPost controller"), err.message;
+      res.status(500).json({
+        message: "Interval Server Error",
+      });
+    }
+  },
 };
 
 export default postController;
