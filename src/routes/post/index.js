@@ -13,4 +13,6 @@ postRouter.post("/post/like/:id", verifyToken, postController.likeUnlikePost);
 
 postRouter.post("/post/comment/:id", verifyToken, postController.commentOnPost);
 
+postRouter.get("/posts", verifyToken, postController.getAllPosts);
+
 export default postRouter;

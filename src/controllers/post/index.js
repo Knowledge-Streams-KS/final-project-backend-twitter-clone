@@ -162,6 +162,36 @@ const postController = {
       });
     }
   },
+  getAllPosts: async (req, res) => {
+    try {
+      const posts = await postModel
+        .find()
+        .sort({ createdAt: -1 })
+        .populate({
+          path: "user",
+          select: "-password",
+        })
+        .populate({
+          path: "comments.user",
+          select: "-password",
+        });
+
+      if (posts.length === 0) {
+        return res.status(200).json({
+          data: [],
+        });
+      }
+
+      res.status(200).json({
+        data: posts,
+      });
+    } catch (err) {
+      console.log("Error in getAllPosts controller", err.messgae);
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
+  },
 };
 
 export default postController;
