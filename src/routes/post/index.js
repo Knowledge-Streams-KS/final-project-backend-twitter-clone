@@ -7,7 +7,7 @@ const postRouter = Router();
 
 postRouter.post("/post/create", verifyToken, postController.createPost);
 
-postRouter.delete("/post/delete", verifyToken, postController.deletePost);
+postRouter.delete("/post/delete/:id", verifyToken, postController.deletePost);
 
 postRouter.post("/post/like/:id", verifyToken, postController.likeUnlikePost);
 

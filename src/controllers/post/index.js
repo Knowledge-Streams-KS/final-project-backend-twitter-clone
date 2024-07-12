@@ -11,7 +11,7 @@ const postController = {
       const user = await userModel.findById(userId);
 
       if (!user) {
-        return res.status(400).json({
+        return res.status(404).json({
           message: "User not found",
         });
       }
@@ -45,9 +45,38 @@ const postController = {
       });
     }
   },
-  deletePost: (req, res) => {
+  deletePost: async (req, res) => {
     try {
+      const id = req.params.id;
+
+      const postToDelete = await postModel.findById(id);
+
+      if (!postToDelete) {
+        return res.status(404).json({
+          message: "Post not found",
+        });
+      }
+
+      if (postToDelete.user.toString() !== req.user.id) {
+        return res.status(401).json({
+          message: "You are not authorized to delete this post",
+        });
+      }
+
+      // delete post image from cloudinary
+      if (postToDelete.img) {
+        const imgId = postToDelete.img.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(imgId);
+      }
+
+      // delete post from database
+      await postModel.deleteOne({ _id: postToDelete._id });
+
+      res.status(200).json({
+        message: "Post deleted successfully",
+      });
     } catch (err) {
+      console.log(err);
       console.log("Error in  deletepost controller"), err.message;
       res.status(500).json({
         message: "Interval Server Error",
