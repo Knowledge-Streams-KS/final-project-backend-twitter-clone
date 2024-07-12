@@ -5,12 +5,12 @@ import checkTokenFromDb from "../../middleware/auth/checkTokenDb.js";
 
 const postRouter = Router();
 
-postRouter.post("/post/create", postController.createPost);
+postRouter.post("/post/create", verifyToken, postController.createPost);
 
-postRouter.delete("/post/delete", postController.deletePost);
+postRouter.delete("/post/delete", verifyToken, postController.deletePost);
 
-postRouter.post("/post/like/:id", postController.likeUnlikePost);
+postRouter.post("/post/like/:id", verifyToken, postController.likeUnlikePost);
 
-postRouter.post("/post/comment/:id", postController.commentOnPost);
+postRouter.post("/post/comment/:id", verifyToken, postController.commentOnPost);
 
 export default postRouter;
