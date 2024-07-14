@@ -12,9 +12,15 @@ notificationRouter.get(
 );
 
 notificationRouter.delete(
-  "/notification/delete",
+  "/notification/",
   verifyToken,
-  notificationController.deleteNotification
+  notificationController.deleteAllNotifications
+);
+
+notificationRouter.delete(
+  "/notification/:id",
+  verifyToken,
+  notificationController.deleteSingleNotification
 );
 
 export default notificationRouter;

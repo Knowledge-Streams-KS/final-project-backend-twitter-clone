@@ -24,10 +24,39 @@ const notificationController = {
       });
     }
   },
-  deleteNotification: async (req, res) => {
+  deleteAllNotifications: async (req, res) => {
     try {
+      const userId = req.user.id;
+      await notificationModel.deleteMany({ to: userId });
+
+      res.status(200).json({
+        message: "Notifications deleted successfully",
+      });
     } catch (err) {
-      console.log("Error in deleteNotification controller", err.message);
+      console.log("Error in deleteAllnotifications controller", err.message);
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  },
+  deleteSingleNotification: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const notificationId = req.params.id;
+      const notification = await notificationModel.findById(notificationId);
+
+      if (!notification) {
+        return res.status(404).json({
+          error: "Notification Not found",
+        });
+      }
+
+      await notificationModel.deleteOne({ notificationId });
+      res.status(200).json({
+        message: "Notification deleted successfully",
+      });
+    } catch (err) {
+      console.log("Error in deleteSinglenotification controller", err.message);
       res.status(500).json({
         message: "Internal server error",
       });
