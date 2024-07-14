@@ -1,11 +1,12 @@
 import tokenModel from "../../models/token/index.js";
-import authController from "../../controllers/auth/index.js";
 import sendEmail from "../../utils/email/index.js";
 import userModel from "../../models/users/index.js";
+import jwt from "jsonwebtoken";
 
 let lock;
 let blockAccessForAll;
 let blocked = [];
+let tokens = [];
 
 const checkTokenFromDb = async (req, res, next) => {
   try {
@@ -19,6 +20,9 @@ const checkTokenFromDb = async (req, res, next) => {
         message: "Unauthorized",
       });
     }
+    if (!tokens.includes(req.token)) {
+      tokens.push(req.token);
+    }
     if (lock) {
       next();
     } else {
@@ -26,43 +30,43 @@ const checkTokenFromDb = async (req, res, next) => {
       // saving query time at expense of security
       lock = true;
       let mins10 = 600000;
-      let token = req.token;
-      let username = req.user.username;
 
       setTimeout(async () => {
         // Current Session compromised
         // How do i know? blacklisted token or report that token was stolen
         // We delete token from DB ourself
 
-        let tokenDB = await tokenModel.findOne({ token });
-        if (!tokenDB) {
-          // Send us email that token not found in DB
-          sendEmail(token);
+        tokens.forEach(async (token) => {
+          let tokenDB = await tokenModel.findOne({ token });
+          if (!tokenDB) {
+            // Send us email that token not found in DB
+            sendEmail(token);
 
-          // If token is made with wrong data using hacked secret key
-          const userCheck = await userModel.findOne({ username });
+            // If token is made with wrong data using hacked secret key
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            let username = decoded.username;
 
-          //set lock false
-          lock = false;
+            const userCheck = await userModel.findOne({ username });
 
-          // Logout of session
-          // If attacker using jwt from current session
-          if (userCheck) {
-            blocked.push(username);
-          } else {
-            //JWT secret compromised
-            blockAccessForAll = true;
+            // If attacker using jwt from current session
+            if (userCheck) {
+              blocked.push(username);
+            } else {
+              //JWT secret compromised
+              blockAccessForAll = true;
+            }
+
+            // If we had deleted the token ourself then its what we wanted and if not that means
+            // secret key is compromised or DB data is inconsistent
+
+            // If we check DB on every request it adds latency due to extra queries as application
+            // scales it is non sustainable
           }
+        });
 
-          // If we had deleted the token ourself then its what we wanted and if not that means
-          // secret key is compromised or DB data is inconsistent
-
-          // If we check DB on every request it adds latency due to extra queries as application
-          // scales it is non sustainable
-        } else {
-          lock = false;
-        }
+        lock = false;
       }, mins10);
+
       next();
     }
   } catch (err) {
