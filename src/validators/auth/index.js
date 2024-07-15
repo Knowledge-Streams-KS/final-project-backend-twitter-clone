@@ -3,7 +3,7 @@ import Joi from "joi";
 const authValidator = {
   signup: (req, res, next) => {
     const schema = Joi.object({
-      fullName: Joi.string().alphanum().min(3).max(20).required(),
+      fullName: Joi.string().min(3).max(20).required(),
       username: Joi.string().alphanum().min(3).max(20).required(),
       email: Joi.string().email().required(),
       password: Joi.string()
