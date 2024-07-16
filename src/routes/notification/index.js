@@ -8,18 +8,21 @@ const notificationRouter = Router();
 notificationRouter.get(
   "/notification/",
   verifyToken,
+  checkTokenFromDb,
   notificationController.getNotification
 );
 
 notificationRouter.delete(
   "/notification/",
   verifyToken,
+  checkTokenFromDb,
   notificationController.deleteAllNotifications
 );
 
 notificationRouter.delete(
   "/notification/:id",
   verifyToken,
+  checkTokenFromDb,
   notificationController.deleteSingleNotification
 );
 
