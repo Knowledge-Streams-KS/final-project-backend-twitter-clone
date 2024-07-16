@@ -13,10 +13,10 @@ authRouter.post("/auth/login", authValidator.login, authController.login);
 authRouter.post("/auth/logout", verifyToken, authController.logout);
 
 authRouter.get(
-  "/auth/user",
+  "/auth/currentUser",
   verifyToken,
   checkTokenFromDb,
-  authController.getUser
+  authController.getCurrentUser
 );
 
 export default authRouter;

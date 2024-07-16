@@ -114,9 +114,14 @@ const authController = {
       });
     }
   },
-  getUser: async (req, res) => {
+  getCurrentUser: async (req, res) => {
     try {
       const user = await userModel.findById(req.user.id).select("-password");
+      if (!user) {
+        return res.status(400).json({
+          message: "Unauthorized",
+        });
+      }
       res.status(200).json({
         data: user,
       });
