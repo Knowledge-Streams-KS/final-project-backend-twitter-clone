@@ -107,8 +107,14 @@ const postController = {
           { _id: userId },
           { $pull: { likedPosts: postId } }
         );
+
+        //for caching at frontend
+        const updatedlikes = post.likes.filter(
+          (id) => id.toString() !== userId
+        );
         res.status(200).json({
           message: "Post unliked successfully",
+          data: updatedlikes,
         });
       } else {
         //like post and send notification to user
@@ -130,8 +136,13 @@ const postController = {
           });
         }
 
+        // for caching purpose
+        post.likes.push(userId);
+        const updatedLikes = post.likes;
+
         res.status(200).json({
           message: "Post liked successfully",
+          data: updatedLikes,
         });
       }
     } catch (err) {
@@ -150,7 +161,7 @@ const postController = {
       const post = await postModel.findById(postId);
 
       if (!post) {
-        res.status(404).json({
+        return res.status(404).json({
           message: "Post not found",
         });
       }
@@ -166,6 +177,7 @@ const postController = {
       });
     } catch (err) {
       console.log("Error in commentOnPost controller"), err.message;
+      console.log(err);
       res.status(500).json({
         message: "Interval Server Error",
       });

@@ -80,3 +80,4 @@ const checkTokenFromDb = async (req, res, next) => {
   }
 };
 export default checkTokenFromDb;
+export { tokens };

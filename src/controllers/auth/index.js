@@ -2,6 +2,7 @@ import { hash, compare } from "bcrypt";
 import userModel from "../../models/users/index.js";
 import jwt from "jsonwebtoken";
 import tokenModel from "../../models/token/index.js";
+import { tokens } from "../../middleware/auth/checkTokenDb.js";
 
 const authController = {
   signup: async (req, res) => {
@@ -101,14 +102,19 @@ const authController = {
     try {
       let token = req.token;
 
+      let tokenTodeleteIndex = tokens.indexOf(token);
+
+      tokens.splice(tokenTodeleteIndex, 1);
+
       // delete token from db
-      await tokenModel.deleteOne({ token });
+      // await tokenModel.deleteOne({ token });
 
       res.clearCookie("jwt").status(200).json({
         message: "Logged out successfully",
       });
     } catch (err) {
       console.log("Error in logout Controller", err.message);
+      console.log(err);
       res.status(500).json({
         message: "Internal server error",
       });

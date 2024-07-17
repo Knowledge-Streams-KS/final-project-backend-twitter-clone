@@ -3,7 +3,8 @@ import Joi from "joi";
 const postValidator = {
   post: (req, res, next) => {
     const schema = Joi.object({
-      text: Joi.string().min(3).max(50),
+      text: Joi.string().max(50),
+      img: Joi.string().allow(null),
     });
 
     const { error, value } = schema.validate(req.body);
@@ -19,15 +20,14 @@ const postValidator = {
         .join("");
 
       return res.status(400).json({
-        message: "Invalid Credentials",
-        details: customErrMessage,
+        message: customErrMessage,
       });
     }
     next();
   },
   comment: (req, res, next) => {
     const schema = Joi.object({
-      text: Joi.string().min(3).max(20),
+      text: Joi.string().max(20),
     });
 
     const { error, value } = schema.validate(req.body);
@@ -43,8 +43,7 @@ const postValidator = {
         .join("");
 
       return res.status(400).json({
-        message: "Invalid Credentials",
-        details: customErrMessage,
+        message: customErrMessage,
       });
     }
     next();
