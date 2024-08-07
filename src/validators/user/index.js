@@ -3,13 +3,15 @@ import Joi from "joi";
 const userValidator = {
   updateProfile: (req, res, next) => {
     const schema = Joi.object({
-      fullName: Joi.string().alphanum().min(3).max(20),
+      fullName: Joi.string().min(3).max(20),
       username: Joi.string().alphanum().min(3).max(20),
       email: Joi.string().email(),
       currentPassword: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{6,30}$")),
       newPassword: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{6,30}$")),
       bio: Joi.string().min(1).max(50),
       link: Joi.string(),
+      profileImg: Joi.string().allow(null),
+      coverImg: Joi.string().allow(null),
     });
 
     const { error, value } = schema.validate(req.body);
