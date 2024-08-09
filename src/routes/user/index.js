@@ -1,7 +1,7 @@
 import { Router } from "express";
 import userController from "../../controllers/user/index.js";
 import verifyToken from "../../middleware/auth/verifyToken.js";
-import checkTokenFromDb from "../../middleware/auth/checkTokenDb.js";
+import tokenService from "../../middleware/auth/checkTokenDb.js";
 import userValidator from "../../validators/user/index.js";
 
 const userRouter = Router();
@@ -9,25 +9,25 @@ const userRouter = Router();
 userRouter.get(
   "/user/profile/:username",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   userController.getUserProfile
 );
 userRouter.get(
   "/user/suggested",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   userController.getSuggestedUsers
 );
 userRouter.post(
   "/user/follow/:id",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   userController.followUnfollowUser
 );
 userRouter.post(
   "/user/update",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   userValidator.updateProfile,
   userController.updateUser
 );

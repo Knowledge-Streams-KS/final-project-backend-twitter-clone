@@ -1,28 +1,28 @@
 import { Router } from "express";
 import notificationController from "../../controllers/notification/index.js";
 import verifyToken from "../../middleware/auth/verifyToken.js";
-import checkTokenFromDb from "../../middleware/auth/checkTokenDb.js";
+import tokenService from "../../middleware/auth/checkTokenDb.js";
 
 const notificationRouter = Router();
 
 notificationRouter.get(
   "/notification/",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   notificationController.getNotification
 );
 
 notificationRouter.delete(
   "/notification/",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   notificationController.deleteAllNotifications
 );
 
 notificationRouter.delete(
   "/notification/:id",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   notificationController.deleteSingleNotification
 );
 

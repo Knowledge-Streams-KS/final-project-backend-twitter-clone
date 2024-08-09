@@ -2,7 +2,7 @@ import { Router } from "express";
 import authController from "../../controllers/auth/index.js";
 import authValidator from "../../validators/auth/index.js";
 import verifyToken from "../../middleware/auth/verifyToken.js";
-import checkTokenFromDb from "../../middleware/auth/checkTokenDb.js";
+import tokenService from "../../middleware/auth/checkTokenDb.js";
 
 const authRouter = Router();
 
@@ -15,7 +15,7 @@ authRouter.post("/auth/logout", verifyToken, authController.logout);
 authRouter.get(
   "/auth/currentUser",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   authController.getCurrentUser
 );
 

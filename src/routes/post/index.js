@@ -1,7 +1,7 @@
 import { Router } from "express";
 import postController from "../../controllers/post/index.js";
 import verifyToken from "../../middleware/auth/verifyToken.js";
-import checkTokenFromDb from "../../middleware/auth/checkTokenDb.js";
+import tokenService from "../../middleware/auth/checkTokenDb.js";
 import postValidator from "../../validators/post/index.js";
 
 const postRouter = Router();
@@ -9,7 +9,7 @@ const postRouter = Router();
 postRouter.post(
   "/post/create",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   postValidator.post,
   postController.createPost
 );
@@ -17,21 +17,21 @@ postRouter.post(
 postRouter.delete(
   "/post/delete/:id",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   postController.deletePost
 );
 
 postRouter.post(
   "/post/like/:id",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   postController.likeUnlikePost
 );
 
 postRouter.post(
   "/post/comment/:id",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   postValidator.comment,
   postController.commentOnPost
 );
@@ -39,14 +39,14 @@ postRouter.post(
 postRouter.get(
   "/post/all",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   postController.getAllPosts
 );
 
 postRouter.get(
   "/post/likes/:id",
   verifyToken,
-  checkTokenFromDb,
+  tokenService.checkTokenFromDb,
   postController.getLikedPosts
 );
 

@@ -2,7 +2,7 @@ import { hash, compare } from "bcrypt";
 import userModel from "../../models/users/index.js";
 import jwt from "jsonwebtoken";
 import tokenModel from "../../models/token/index.js";
-import { tokens } from "../../middleware/auth/checkTokenDb.js";
+import tokenService from "../../middleware/auth/checkTokenDb.js";
 
 const authController = {
   signup: async (req, res) => {
@@ -101,6 +101,8 @@ const authController = {
   logout: async (req, res) => {
     try {
       let token = req.token;
+
+      const tokens = tokenService.getTokens();
 
       let tokenTodeleteIndex = tokens.indexOf(token);
 
